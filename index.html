@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KooWiki - AI 代码知识站</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-content">
+        <h1>KooWiki</h1>
+        <p>把 DeepWiki / CodeWiki / Zread 的长板融合成一个可追溯的 AI 代码知识站。</p>
+        <form id="repo-form" class="repo-form">
+          <input id="repo-url" type="url" placeholder="粘贴 GitHub/GitLab 仓库地址..." required />
+          <button type="submit">开始生成 Wiki</button>
+        </form>
+        <small>示例：https://github.com/vercel/next.js</small>
+      </div>
+    </header>
+
+    <main class="container hidden" id="workspace">
+      <section class="panel">
+        <h2>仓库概览</h2>
+        <div id="repo-summary" class="summary-grid"></div>
+      </section>
+
+      <section class="panel">
+        <h2>自动生成文档</h2>
+        <div id="wiki-sections" class="wiki-sections"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Ask Repo（带引用）</h2>
+        <div id="chat-log" class="chat-log"></div>
+        <form id="ask-form" class="ask-form">
+          <input id="ask-input" type="text" placeholder="例如：这个项目的核心渲染流程是什么？" required />
+          <button type="submit">提问</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>架构关系图（MVP）</h2>
+        <svg id="arch-svg" viewBox="0 0 700 260" aria-label="模块关系图"></svg>
+      </section>
+    </main>
+
+    <template id="message-template">
+      <article class="message">
+        <p class="question"></p>
+        <p class="answer"></p>
+        <ul class="citations"></ul>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

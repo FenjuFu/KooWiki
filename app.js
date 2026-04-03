@@ -8,6 +8,16 @@ const wikiSections = document.getElementById("wiki-sections");
 const chatLog = document.getElementById("chat-log");
 const messageTemplate = document.getElementById("message-template");
 const archSvg = document.getElementById("arch-svg");
+const supportedHosts = {
+  "github.com": "GitHub",
+  "www.github.com": "GitHub",
+  "gitee.com": "Gitee",
+  "www.gitee.com": "Gitee",
+  "atomgit.com": "AtomGit",
+  "www.atomgit.com": "AtomGit",
+  "gitlink.org.cn": "GitLink",
+  "www.gitlink.org.cn": "GitLink",
+};
 
 const mockSectionSeeds = [
   ["项目概览", "解释系统目标、边界和主要技术栈。"],
@@ -43,7 +53,13 @@ repoForm.addEventListener("submit", (event) => {
   const url = repoUrlInput.value.trim();
   if (!url) return;
 
-  renderSummary(url);
+  const parsed = parseRepoUrl(url);
+  if (!parsed) {
+    alert("仅支持 GitHub / Gitee / AtomGit / GitLink 的仓库地址。");
+    return;
+  }
+
+  renderSummary(parsed);
   renderWiki();
   renderArchitecture();
 
@@ -61,12 +77,11 @@ askForm.addEventListener("submit", (event) => {
   askInput.value = "";
 });
 
-function renderSummary(url) {
-  const host = new URL(url).hostname;
-  const repo = url.split("/").slice(-2).join("/");
+function renderSummary(parsed) {
   const cards = [
-    ["仓库", repo || "未知"],
-    ["来源", host],
+    ["仓库", parsed.repo || "未知"],
+    ["来源", parsed.platform],
+    ["地址", parsed.url],
     ["索引状态", "已完成（模拟）"],
     ["最近更新", new Date().toLocaleDateString("zh-CN")],
   ];
@@ -77,6 +92,30 @@ function renderSummary(url) {
         `<article class="summary-card"><strong>${label}</strong><span>${value}</span></article>`,
     )
     .join("");
+}
+
+function parseRepoUrl(rawUrl) {
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl);
+  } catch {
+    return null;
+  }
+
+  const platform = supportedHosts[parsedUrl.hostname.toLowerCase()];
+  if (!platform) return null;
+
+  const segments = parsedUrl.pathname
+    .replace(/\.git$/, "")
+    .split("/")
+    .filter(Boolean);
+  if (segments.length < 2) return null;
+
+  return {
+    platform,
+    url: parsedUrl.toString(),
+    repo: `${segments[0]}/${segments[1]}`,
+  };
 }
 
 function renderWiki() {
